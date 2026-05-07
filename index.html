@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VN Template Search</title>
+
+<style>
+    :root{
+        --bg: #ffffff;
+        --bg-elev: #f7f7f7;
+        --text: #111111;
+        --muted: #6f6f6f;
+        --line: rgba(0,0,0,.08);
+        --shadow: 0 8px 24px rgba(0,0,0,.10);
+        --shadow-hover: 0 14px 34px rgba(0,0,0,.16);
+        --red: #e60023;
+        --red-hover: #d50020;
+        --chip: rgba(255,255,255,.92);
+        --blue: #2563eb;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+    }
+
+    body {
+        min-height: 100vh;
+    }
+
+    .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(255,255,255,.88);
+        backdrop-filter: blur(14px);
+        border-bottom: 1px solid var(--line);
+    }
+
+    .topbar-inner {
+        max-width: 1400px;
+        margin: 0 auto;
+        height: 72px;
+        padding: 0 18px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 18px;
+        letter-spacing: -0.02em;
+        user-select: none;
+        white-space: nowrap;
+    }
+
+    .brand-badge {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--red);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        box-shadow: 0 8px 18px rgba(230, 0, 35, .25);
+    }
+
+    .search-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--bg-elev);
+        border: 1px solid transparent;
+        border-radius: 999px;
+        padding: 10px 14px;
+        transition: .2s ease;
+    }
+
+    .search-box:focus-within {
+        background: #fff;
+        border-color: rgba(230,0,35,.22);
+        box-shadow: 0 0 0 4px rgba(230,0,35,.08);
+    }
+
+    .search-icon {
+        width: 18px;
+        height: 18px;
+        flex: 0 0 18px;
+        color: var(--muted);
+    }
+
+    .search-box input {
+        width: 100%;
+        border: 0;
+        outline: none;
+        background: transparent;
+        font-size: 14px;
+        color: var(--text);
+        min-width: 0;
+    }
+
+    .search-box input::placeholder {
+        color: #8a8a8a;
+    }
+
+    .search-btn {
+        border: 0;
+        outline: none;
+        background: var(--red);
+        color: #fff;
+        font-weight: 700;
+        height: 44px;
+        padding: 0 18px;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: .18s ease;
+        box-shadow: 0 8px 18px rgba(230,0,35,.22);
+        white-space: nowrap;
+    }
+
+    .search-btn:hover {
+        background: var(--red-hover);
+        transform: translateY(-1px);
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 22px 18px 34px;
+    }
+
+    .guide-card {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, #fff, #fafafa);
+        border-radius: 22px;
+        box-shadow: var(--shadow);
+        padding: 16px 16px 15px;
+        margin-bottom: 18px;
+    }
+
+    .guide-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 999px;
+        background: rgba(230,0,35,.08);
+        color: var(--red);
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        flex: 0 0 42px;
+    }
+
+    .guide-title {
+        font-size: 15px;
+        font-weight: 700;
+        margin: 0 0 6px;
+        letter-spacing: -0.01em;
+    }
+
+    .guide-steps {
+        display: grid;
+        gap: 4px;
+        color: #353535;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .guide-note {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .count {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 0 0 16px;
+        padding-left: 2px;
+    }
+
+    .grid {
+        column-count: 5;
+        column-gap: 16px;
+    }
+
+    @media (max-width: 1400px) {
+        .grid { column-count: 4; }
+    }
+    @media (max-width: 1120px) {
+        .topbar-inner {
+            grid-template-columns: auto 1fr;
+            grid-template-areas:
+                "brand brand"
+                "search search";
+            height: auto;
+            padding: 14px 18px;
+        }
+        .brand { grid-area: brand; }
+        .search-box { grid-area: search; }
+        .grid { column-count: 3; }
+    }
+    @media (max-width: 780px) {
+        .grid { column-count: 2; }
+        .search-btn { padding: 0 14px; }
+    }
+    @media (max-width: 520px) {
+        .grid { column-count: 1; }
+        .topbar-inner { padding: 12px 14px; }
+        .container { padding: 18px 14px 28px; }
+        .guide-card {
+            padding: 14px;
+            border-radius: 18px;
+        }
+    }
+
+    .pin {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        margin: 0 0 16px;
+        break-inside: avoid;
+        border-radius: 22px;
+        overflow: hidden;
+        background: #f3f3f3;
+        box-shadow: var(--shadow);
+        transform: translateZ(0);
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .pin:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .pin-media {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        background: #ececec;
+        cursor: pointer;
+    }
+
+    .pin-media img,
+    .pin-media iframe {
+        width: 100%;
+        display: block;
+        object-fit: cover;
+    }
+
+    .pin-media img {
+        aspect-ratio: 3 / 4;
+        transition: transform .35s ease, filter .35s ease;
+    }
+
+    .pin:hover .pin-media img {
+        transform: scale(1.02);
+        filter: saturate(1.02);
+    }
+
+    .pin-media iframe {
+        position: absolute;
+        inset: 0;
+        height: 100%;
+        border: 0;
+        display: none;
+        background: #000;
+    }
+
+    .pin-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 12px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity .18s ease;
+        background:
+            linear-gradient(to top, rgba(0,0,0,.34), rgba(0,0,0,0) 40%),
+            linear-gradient(to bottom, rgba(0,0,0,.12), rgba(0,0,0,0) 22%);
+    }
+
+    .pin:hover .pin-overlay,
+    .pin:focus-within .pin-overlay {
+        opacity: 1;
+    }
+
+    .save-pill {
+        align-self: flex-end;
+        pointer-events: auto;
+        border: 0;
+        outline: none;
+        background: var(--red);
+        color: #fff;
+        height: 44px;
+        padding: 0 16px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(230,0,35,.28);
+        transition: .18s ease;
+    }
+
+    .save-pill:hover {
+        background: var(--red-hover);
+        transform: translateY(-1px);
+    }
+
+    .overlay-actions {
+        pointer-events: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 10px;
+    }
+
+    .icon-btns {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .icon-btn {
+        width: 42px;
+        height: 42px;
+        border: 0;
+        outline: none;
+        border-radius: 999px;
+        background: var(--chip);
+        color: #111;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(0,0,0,.12);
+        transition: transform .16s ease, background .16s ease;
+        backdrop-filter: blur(12px);
+    }
+
+    .icon-btn:hover {
+        transform: scale(1.05);
+        background: #fff;
+    }
+
+    .icon-btn.download {
+        color: var(--blue);
+    }
+
+    .icon {
+        width: 20px;
+        height: 20px;
+        display: block;
+        fill: currentColor;
+    }
+
+    .pin-footer {
+        padding: 12px 14px 14px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .pin-title {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.35;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        color: var(--text);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 38px;
+    }
+
+    .pin-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .pin-domain {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
+    }
+
+    .loader {
+        text-align: center;
+        padding: 22px 0 10px;
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    .skeleton {
+        border-radius: 22px;
+        overflow: hidden;
+        background: #f0f0f0;
+        box-shadow: var(--shadow);
+        margin-bottom: 16px;
+        break-inside: avoid;
+    }
+
+    .skeleton .ph-img {
+        aspect-ratio: 3 / 4;
+        background: linear-gradient(90deg, #eee, #f7f7f7, #eee);
+        background-size: 200% 100%;
+        animation: shimmer 1.15s infinite linear;
+    }
+
+    .skeleton .ph-body {
+        padding: 12px 14px 14px;
+    }
+
+    .skeleton .ph-line {
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #eee, #f7f7f7, #eee);
+        background-size: 200% 100%;
+        animation: shimmer 1.15s infinite linear;
+        margin-bottom: 10px;
+    }
+
+    .skeleton .ph-line.short { width: 58%; }
+
+    @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    .empty {
+        padding: 28px 16px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+        .pin-overlay {
+            opacity: 1;
+        }
+
+        .pin-media img {
+            filter: none;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+        }
+
+        .save-pill {
+            height: 40px;
+            font-size: 13px;
+        }
+    }
+</style>
+</head>
+
+<body>
+    <div class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">
+                <div class="brand-badge">P</div>
+                VN Pins
+            </div>
+
+            <div class="search-box">
+                <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor" d="M10 4a6 6 0 104.472 10.028l4.75 4.75 1.414-1.414-4.75-4.75A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z"/>
+                </svg>
+                <input id="query" placeholder="Search: love vn template, cinematic, wedding..." />
+            </div>
+
+            <button class="search-btn" onclick="search()">Search</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="guide-card">
+            <div class="guide-icon">i</div>
+            <div>
+                <div class="guide-title">How to use a saved QR image in VN</div>
+                <div class="guide-steps">
+                    <div>1. Tap <strong>Save photo</strong> to download the QR image.</div>
+                    <div>2. Open <strong>VN Video Editor</strong>.</div>
+                    <div>3. Use <strong>Scan</strong> or <strong>Import from Photos / Gallery</strong> inside VN.</div>
+                    <div>4. Select the downloaded image from your phone.</div>
+                </div>
+                <div class="guide-note">Menu labels can vary slightly by VN version. Allow photo/files access if prompted.</div>
+            </div>
+        </div>
+
+        <div class="count" id="count"></div>
+        <div id="results" class="grid"></div>
+        <div id="loader" class="loader"></div>
+    </div>
+
+<script>
+function isYouTubeUrl(url) {
+    return /(?:youtube\.com|youtu\.be)/i.test(url || "");
+}
+
+function getYouTubeVideoId(url) {
+    try {
+        const u = new URL(url);
+
+        if (u.hostname.includes("youtu.be")) {
+            return u.pathname.slice(1);
+        }
+
+        if (u.searchParams.get("v")) {
+            return u.searchParams.get("v");
+        }
+
+        const shorts = u.pathname.match(/\/shorts\/([^/?]+)/);
+        if (shorts) return shorts[1];
+
+        const embed = u.pathname.match(/\/embed\/([^/?]+)/);
+        if (embed) return embed[1];
+
+        return null;
+    } catch {
+        return null;
+    }
+}
+
+function getPinterestTitle(item) {
+    const raw = (item.pin_title || item.title || item.page_url || "").trim();
+    if (!raw) return "VN template";
+    return raw.replace(/^this contains an image of:\s*/i, "");
+}
+
+function safeDomain(url) {
+    try {
+        return new URL(url).hostname.replace(/^www\./, "");
+    } catch {
+        return "source";
+    }
+}
+
+function escapeHtml(text) {
+    return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+}
+
+function slugify(text) {
+    return String(text || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 60) || "vn-pin";
+}
+
+function copyText(text) {
+    navigator.clipboard.writeText(text);
+}
+
+async function downloadImage(url, baseName = "vn-template") {
+    try {
+        const response = await fetch(url, { mode: "cors" });
+        const blob = await response.blob();
+
+        // detect type from response
+        const mime = blob.type; // e.g. image/png
+        let ext = mime.split("/")[1];
+
+        if (ext === "jpeg") ext = "jpg";
+        if (!ext) ext = getExtensionFromUrl(url) || "jpg";
+
+        const fileName = `${baseName}.${ext}`;
+
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        window.URL.revokeObjectURL(blobUrl);
+
+    } catch (err) {
+        console.error("Download failed:", err.message);
+
+        // fallback using URL-based extension
+        const ext = getExtensionFromUrl(url) || "jpg";
+        const fileName = `${baseName}.${ext}`;
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+}
+
+function playPreview(container) {
+    const iframe = container.querySelector("iframe");
+    if (!iframe) return;
+
+    if (!iframe.src) {
+        iframe.src = iframe.dataset.src;
+    }
+
+    iframe.style.display = "block";
+
+    const img = container.querySelector("img");
+    if (img) img.style.visibility = "hidden";
+}
+
+function stopPreview(container) {
+    const iframe = container.querySelector("iframe");
+    if (!iframe) return;
+
+    iframe.style.display = "none";
+    iframe.src = "";
+
+    const img = container.querySelector("img");
+    if (img) img.style.visibility = "visible";
+}
+
+function renderSkeletons(count = 10) {
+    const resultsDiv = document.getElementById("results");
+    let html = "";
+    for (let i = 0; i < count; i++) {
+        html += `
+            <div class="skeleton">
+                <div class="ph-img"></div>
+                <div class="ph-body">
+                    <div class="ph-line"></div>
+                    <div class="ph-line short"></div>
+                </div>
+            </div>
+        `;
+    }
+    resultsDiv.innerHTML = html;
+}
+
+function getExtensionFromUrl(url) {
+    try {
+        const cleanUrl = url.split("?")[0]; // remove query params
+        const parts = cleanUrl.split(".");
+        const ext = parts.pop().toLowerCase();
+
+        // basic validation
+        if (["jpg", "jpeg", "png", "webp", "gif"].includes(ext)) {
+            return ext === "jpeg" ? "jpg" : ext;
+        }
+    } catch {}
+
+    return null;
+}
+
+async function search() {
+    const query = document.getElementById("query").value.trim();
+    const resultsDiv = document.getElementById("results");
+    const countDiv = document.getElementById("count");
+    const loader = document.getElementById("loader");
+
+    if (!query) {
+        countDiv.textContent = "";
+        resultsDiv.innerHTML = `<div class="empty">Type a search term to discover pins.</div>`;
+        return;
+    }
+
+    countDiv.textContent = "";
+    loader.textContent = "";
+    renderSkeletons(12);
+
+    try {
+        const res = await fetch(`/search?query=${encodeURIComponent(query)}&limit=100`);
+        const data = await res.json();
+        const results = Array.isArray(data.results) ? data.results : [];
+
+        loader.textContent = "";
+        countDiv.textContent = `Found ${data.total ?? results.length} templates`;
+
+        if (!results.length) {
+            resultsDiv.innerHTML = `<div class="empty">No cached results yet for this search term.</div>`;
+            return;
+        }
+
+        resultsDiv.innerHTML = "";
+
+        results.forEach(item => {
+            const card = document.createElement("article");
+            card.className = "pin";
+
+            const pageUrl = item.page_url || "";
+            const imgUrl = item.preview_image || "";
+            const title = getPinterestTitle(item);
+            const domain = safeDomain(pageUrl);
+            const isYT = isYouTubeUrl(pageUrl);
+            const videoId = isYT ? getYouTubeVideoId(pageUrl) : null;
+            const fileName = `${slugify(title || domain)}-${item.id}`;
+
+            card.innerHTML = `
+                <div class="pin-media">
+                    <img src="${imgUrl}" alt="${escapeHtml(title)}" loading="lazy" />
+
+                    ${item.preview_video ? `
+                        <iframe
+                            data-src="${item.preview_video}"
+                            allow="autoplay; encrypted-media; picture-in-picture"
+                            allowfullscreen
+                            referrerpolicy="strict-origin-when-cross-origin"
+                        ></iframe>
+                    ` : ""}
+
+                    <div class="pin-overlay">
+                        <button class="save-pill js-save"
+                            type="button"
+                            aria-label="Save QR Code image for VN"
+                            title="Save QR Code image for VN">
+                            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M5 20h14v-2H5v2zm7-18-5 5h3v6h4V7h3l-5-5z"/>
+                            </svg>
+                            Save QR Code   
+                        </button>
+
+                        <div class="overlay-actions">
+                            <div class="icon-btns">
+
+                                <button class="icon-btn js-source"
+                                    type="button"
+                                    aria-label="Open source"
+                                    title="Open source">
+                                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M14 3h7v7h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H14V3z"/>
+                                        <path d="M5 5h6v2H7v10h10v-4h2v6H5V5z"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            ${item.preview_video ? `
+                                <button class="icon-btn js-play"
+                                    type="button"
+                                    aria-label="Play preview"
+                                    title="Play preview">
+                                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M8 5v14l11-7L8 5z"/>
+                                    </svg>
+                                </button>
+                            ` : ""}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pin-footer">
+                    <h3 class="pin-title">${escapeHtml(title)}</h3>
+                    <div class="pin-meta">
+                        <span class="pin-domain">${escapeHtml(domain)}</span>
+                        <span>${isYT ? "Video" : "Pin"}</span>
+                    </div>
+                </div>
+            `;
+
+            const media = card.querySelector(".pin-media");
+            const btnSave = card.querySelector(".js-save");
+            const btnDownload = card.querySelector(".js-download");
+            const btnSource = card.querySelector(".js-source");
+            const btnPlay = card.querySelector(".js-play");
+            const proxiedUrl = `/proxy-image?url=${encodeURIComponent(item.qr_image)}`;
+
+            btnSave?.addEventListener("click", async (e) => {
+                e.stopPropagation();
+                await downloadImage(proxiedUrl, fileName);
+            });
+
+            btnDownload?.addEventListener("click", async (e) => {
+                e.stopPropagation();
+                await downloadImage(proxiedUrl, fileName);
+            });
+
+            btnSource?.addEventListener("click", (e) => {
+                e.stopPropagation();
+                window.open(pageUrl, "_blank", "noopener,noreferrer");
+            });
+
+            btnPlay?.addEventListener("click", (e) => {
+                e.stopPropagation();
+                playPreview(media);
+            });
+
+            media?.addEventListener("mouseenter", () => {
+                if (videoId) playPreview(media);
+            });
+
+            media?.addEventListener("mouseleave", () => {
+                if (videoId) stopPreview(media);
+            });
+
+            media?.addEventListener("click", () => {
+                if (videoId) {
+                    playPreview(media);
+                    return;
+                }
+                window.open(pageUrl, "_blank", "noopener,noreferrer");
+            });
+
+            resultsDiv.appendChild(card);
+        });
+
+    } catch (e) {
+        console.log(e);
+        loader.textContent = "Error loading data";
+        resultsDiv.innerHTML = "";
+    }
+}
+
+document.getElementById("query").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") search();
+});
+</script>
+</body>
+</html>
